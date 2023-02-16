@@ -30,7 +30,8 @@ const Channels = () => {
         {channels.map((channel: any) => (
           <div className="channel" key={channel.id}>
             <a>
-              {channel.id} <span>{channel.name}</span>
+              {channel.id}{" "}
+              <span>{channel.name ?? channel.targetUser.email}</span>
             </a>
           </div>
         ))}
