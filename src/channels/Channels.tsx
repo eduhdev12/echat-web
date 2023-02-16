@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import useSessionStore from "../store/sessionStore";
+import "../style/Channels.css";
 
 const Channels = () => {
   const session = useSessionStore();

@@ -1,0 +1,9 @@
+.channels {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+
+    padding: 1rem;
+    background-color: #1B263B;
+}
