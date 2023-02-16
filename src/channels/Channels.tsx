@@ -1,0 +1,41 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import useSessionStore from "../store/sessionStore";
+
+const Channels = () => {
+  const session = useSessionStore();
+  const [channels, setChannels] = useState([]);
+
+  useEffect(() => {
+    console.log("Updating channels");
+    if (!session.data.token) return;
+
+    axios
+      .get(`${import.meta.env.VITE_API_ENDPOINT}/channels/testadmin`, {
+        headers: { Authorization: `Bearer ${session.data.token}` },
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (!res.data || res.data.length === 0) return;
+
+        setChannels(res.data);
+      })
+      .catch((error) => console.log("Error while getting channels", error));
+  }, [session.data]);
+
+  if (session.data.token) {
+    return (
+      <>
+        {channels.map((channel: any) => (
+          <div className="channel" key={channel.id}>
+            <a>
+              {channel.id} <span>{channel.name}</span>
+            </a>
+          </div>
+        ))}
+      </>
+    );
+  } else return <></>;
+};
+
+export default Channels;
