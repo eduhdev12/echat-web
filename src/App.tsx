@@ -4,6 +4,7 @@ import Login from "./auth/Login";
 import User from "./auth/User";
 import Channels from "./channels/Channels";
 import { SocketContext } from "./context/socketContext";
+import Messages from "./messages/messages";
 import useSessionStore from "./store/sessionStore";
 
 function App() {
@@ -25,6 +26,10 @@ function App() {
 
       <div className="channels">
         <Channels />
+      </div>
+
+      <div className="messages">
+        <Messages />
       </div>
     </div>
   );
