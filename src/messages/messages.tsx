@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../context/socketContext";
 import { Message, NewMessage, UserMessage } from "../types/Message.type";
 import MessageContainer from "./message/message";
+import "../style/ChannelMessages.css"
 
 const Messages = () => {
   const { socket } = useContext(SocketContext);

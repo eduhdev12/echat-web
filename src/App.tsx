@@ -11,14 +11,16 @@ function App() {
   const session = useSessionStore();
   const { socket } = useContext(SocketContext);
 
+  socket?.emit("joinRoom");
+
   return (
     <div className="App">
-      {socket && (
+      {/* {socket && (
         <>
           <button onClick={() => socket.emit("joinRoom")}>JOin ROom</button>
           <button onClick={() => socket.emit("trigger")}>Trigger</button>
         </>
-      )}
+      )} */}
 
       <div className="auth-components">
         {session.data.id ? <User /> : <Login />}
