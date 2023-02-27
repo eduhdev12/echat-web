@@ -4,6 +4,7 @@ import Login from "./auth/Login";
 import User from "./auth/User";
 import Channels from "./channels/Channels";
 import { SocketContext } from "./context/socketContext";
+import SendMessage from "./messages/components/SendMessage";
 import Messages from "./messages/messages";
 import useSessionStore from "./store/sessionStore";
 
@@ -32,6 +33,7 @@ function App() {
 
       <div className="messages">
         <Messages />
+        <SendMessage />
       </div>
     </div>
   );
