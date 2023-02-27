@@ -9,7 +9,7 @@ const Messages = () => {
   const [messages, setMessages] = useState<Message[]>([]);
 
   socket?.on(
-    "newMessage",
+    "messageCreate",
     (msg: NewMessage, sender: UserMessage, createdAt: Date) => {
       let newMsg: Message = { message: msg, sender: sender };
       setMessages([...messages, newMsg]);

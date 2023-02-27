@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import "./App.css";
 import Login from "./auth/Login";
 import User from "./auth/User";
@@ -12,7 +12,12 @@ function App() {
   const session = useSessionStore();
   const { socket } = useContext(SocketContext);
 
-  socket?.emit("joinRoom");
+  useEffect(() => {
+    setTimeout(() => {
+      if (!socket) return;
+      socket.emit("joinRoom");
+    }, 1500);
+  }, []);
 
   return (
     <div className="App">

@@ -9,7 +9,7 @@ const SendMessage = () => {
     console.log("sending");
     if (!socket) return;
 
-    socket.emit("trigger");
+    socket.emit("messageCreate", {content: message});
     setMessage("");
   };
 
