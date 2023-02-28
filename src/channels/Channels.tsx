@@ -23,7 +23,10 @@ const Channels = () => {
 
         setChannels(res.data);
       })
-      .catch((error) => console.log("Error while getting channels", error));
+      .catch((error) => {
+        console.log("Error while getting channels", error);
+        session.logOut();
+      });
   }, [session.data]);
 
   const handleChannels = (id: number) => {
