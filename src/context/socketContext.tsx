@@ -18,6 +18,7 @@ const SocketProvider = (props: any) => {
         socket: session.data.token
           ? io(import.meta.env.VITE_API_ENDPOINT, {
               auth: { token: session.data.token },
+              reconnection: false,
             })
           : null,
       }}
