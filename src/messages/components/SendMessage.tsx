@@ -6,7 +6,6 @@ const SendMessage = () => {
   const [message, setMessage] = useState<string>();
 
   const sendHandler = () => {
-    console.log("sending");
     if (!socket) return;
 
     socket.emit("messageCreate", {content: message});
