@@ -4,13 +4,20 @@ import { SocketContext } from "../../context/socketContext";
 const SendMessage = () => {
   const { socket } = useContext(SocketContext);
   const [message, setMessage] = useState<string>();
+  const [joinedRoom, setJoinedRoom] = useState<boolean>(false);
+
+  socket?.on("joinRoom", () => {
+    setJoinedRoom(true);
+  });
 
   const sendHandler = () => {
     if (!socket) return;
 
-    socket.emit("messageCreate", {content: message});
+    socket.emit("messageCreate", { content: message });
     setMessage("");
   };
+
+  if (!joinedRoom) return <></>;
 
   return (
     <input
