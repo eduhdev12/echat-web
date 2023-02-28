@@ -1,10 +1,12 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { SocketContext } from "../context/socketContext";
 import useSessionStore from "../store/sessionStore";
 import "../style/Channels.css";
 
 const Channels = () => {
   const session = useSessionStore();
+  const { socket } = useContext(SocketContext);
   const [channels, setChannels] = useState([]);
 
   useEffect(() => {
@@ -24,11 +26,21 @@ const Channels = () => {
       .catch((error) => console.log("Error while getting channels", error));
   }, [session.data]);
 
+  const handleChannels = (id: number) => {
+    if (!socket || !id) return;
+
+    socket.emit("joinRoom", id);
+  };
+
   if (session.data.token) {
     return (
       <>
         {channels.map((channel: any) => (
-          <div className="channel" key={channel.id}>
+          <div
+            className="channel"
+            key={channel.id}
+            onClick={() => handleChannels(channel.id)}
+          >
             <a>
               {channel.id}{" "}
               <span>{channel.name ?? channel.targetUser.email}</span>

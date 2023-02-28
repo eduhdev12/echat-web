@@ -15,3 +15,10 @@ export interface UserMessage {
   role: string;
   username: string;
 }
+
+export interface SetMessage {
+  id: string;
+  sender: UserMessage;
+  content: string;
+  createdAt: Date;
+}

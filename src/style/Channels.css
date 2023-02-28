@@ -1,4 +1,5 @@
 .channels {
+    cursor: pointer;
     display: flex;
     flex-direction: column;
 

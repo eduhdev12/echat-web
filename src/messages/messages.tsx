@@ -1,8 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { SocketContext } from "../context/socketContext";
-import { Message, NewMessage, UserMessage } from "../types/Message.type";
-import MessageContainer from "./message/message";
 import "../style/ChannelMessages.css";
+import {
+  Message,
+  NewMessage,
+  SetMessage,
+  UserMessage,
+} from "../types/Message.type";
+import MessageContainer from "./message/message";
 
 const Messages = () => {
   const { socket } = useContext(SocketContext);
@@ -15,6 +20,20 @@ const Messages = () => {
       setMessages([...messages, newMsg]);
     }
   );
+
+  socket?.on("setMessages", (msgs: SetMessage[]) => {
+    let newMessages: Message[] = [];
+
+    msgs.map((msg) => {
+      let newMsg: Message = {
+        message: { text: msg.content, createdAt: msg.createdAt },
+        sender: msg.sender,
+      };
+      newMessages.push(newMsg);
+    });
+
+    setMessages(newMessages);
+  });
 
   return (
     <div className="channel_messages">
