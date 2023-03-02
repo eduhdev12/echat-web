@@ -7,6 +7,9 @@ import { SocketContext } from "./context/socketContext";
 import SendMessage from "./messages/components/SendMessage";
 import Messages from "./messages/messages";
 import useSessionStore from "./store/sessionStore";
+// @ts-ignore: caca
+import crypto from "crypto-browserify";
+import { Buffer } from "buffer/"; // <-- no typo here ("/")
 
 function App() {
   const session = useSessionStore();
@@ -18,6 +21,13 @@ function App() {
       socket.emit("joinRoom");
     }, 1500);
   }, []);
+
+  socket?.on("publicKey", (keyy: string) => {
+    const dh = crypto.createECDH("secp256k1");
+    dh.generateKeys();
+
+    console.log("asa e", dh.getPublicKey().toString("utf-8"));
+  });
 
   return (
     <div className="App">
