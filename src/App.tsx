@@ -14,19 +14,30 @@ import { Buffer } from "buffer/"; // <-- no typo here ("/")
 function App() {
   const session = useSessionStore();
   const { socket } = useContext(SocketContext);
+  const ecdh = crypto.createECDH("secp256k1");
 
   useEffect(() => {
     setTimeout(() => {
       if (!socket) return;
       socket.emit("joinRoom");
+
+      ecdh.generateKeys("base64");
+      let publicKey = ecdh.generateKeys("base64"); // ecdh.getPublicKey("hex");
+      socket.emit("publicKey", publicKey);
+
     }, 1500);
   }, []);
 
-  socket?.on("publicKey", (keyy: string) => {
-    const dh = crypto.createECDH("secp256k1");
-    dh.generateKeys();
+  socket?.on("publicKey", (keyy: any, clientKey: any, sharedKey: any) => {
+    try {
+      const shared = ecdh.computeSecret(keyy, "base64", "base64");
 
-    console.log("asa e", dh.getPublicKey().toString("utf-8"));
+      console.log(shared);
+      console.log(sharedKey)
+      console.log(shared === sharedKey)
+    } catch (error) {
+      // console.error("Eroare", error)
+    }
   });
 
   return (
