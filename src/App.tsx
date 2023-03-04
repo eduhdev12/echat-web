@@ -10,11 +10,11 @@ import useSessionStore from "./store/sessionStore";
 
 function App() {
   const session = useSessionStore();
-  const { socket, ecdhInstance } = useContext(SocketContext);
+  const { socket, sharedKey, ecdhInstance } = useContext(SocketContext);
 
   socket?.on(
     "publicKey",
-    (serverKey: string, clientKey: string, sharedKey: string) => {
+    (serverKey: string, clientKey: string, sharedServerKey: string) => {
       try {
         const shared = ecdhInstance.computeSecret(
           serverKey,
@@ -22,8 +22,11 @@ function App() {
           "base64"
         );
 
-        console.table([serverKey, clientKey, sharedKey]);
-        console.log(shared === sharedKey);
+        // Note: remove the condition when we remove the argument for verification
+        if (shared === sharedServerKey) {
+          sharedKey.set(shared);
+          console.log("Sharedkey setup");
+        }
       } catch (error) {
         console.error("Eroare", error);
       }

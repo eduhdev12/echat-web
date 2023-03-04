@@ -6,6 +6,10 @@ import crypto from "crypto-browserify";
 
 interface SocketContext {
   socket: Socket | null;
+  sharedKey: {
+    value: string | undefined;
+    set: React.Dispatch<React.SetStateAction<string | undefined>>;
+  };
   ecdhInstance: any;
 }
 export const SocketContext = React.createContext<SocketContext>(
@@ -14,7 +18,8 @@ export const SocketContext = React.createContext<SocketContext>(
 
 const SocketProvider = (props: any) => {
   const session = useSessionStore();
-  const [publicKey, setPublicKey] = useState<any>();
+  const [publicKey, setPublicKey] = useState<string>();
+  const [sharedKey, setSharedKey] = useState<string>();
   const [ecdhInstance, setECDH] = useState<any>();
 
   useEffect(() => {
@@ -35,6 +40,7 @@ const SocketProvider = (props: any) => {
                 reconnection: false,
               })
             : null,
+        sharedKey: { value: sharedKey, set: setSharedKey },
         ecdhInstance,
       }}
     >
