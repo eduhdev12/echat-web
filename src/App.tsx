@@ -6,11 +6,13 @@ import Channels from "./channels/Channels";
 import { SocketContext } from "./context/socketContext";
 import SendMessage from "./messages/components/SendMessage";
 import Messages from "./messages/messages";
+import useSecretStore from "./store/secretStore";
 import useSessionStore from "./store/sessionStore";
 
 function App() {
   const session = useSessionStore();
-  const { socket, sharedKey, ecdhInstance } = useContext(SocketContext);
+  const secret = useSecretStore();
+  const { socket, ecdhInstance } = useContext(SocketContext);
 
   socket?.on(
     "publicKey",
@@ -24,7 +26,9 @@ function App() {
 
         // Note: remove the condition when we remove the argument for verification
         if (shared === sharedServerKey) {
-          sharedKey.set(shared);
+          secret.setSharedKey(shared);
+          // setSharedKey(shared)
+          // sharedKey.set(shared);
           console.log("Sharedkey setup");
         }
       } catch (error) {
