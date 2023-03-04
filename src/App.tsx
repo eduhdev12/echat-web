@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import "./App.css";
 import Login from "./auth/Login";
 import User from "./auth/User";
@@ -7,38 +7,28 @@ import { SocketContext } from "./context/socketContext";
 import SendMessage from "./messages/components/SendMessage";
 import Messages from "./messages/messages";
 import useSessionStore from "./store/sessionStore";
-// @ts-ignore: caca
-import crypto from "crypto-browserify";
-import { Buffer } from "buffer/"; // <-- no typo here ("/")
 
 function App() {
   const session = useSessionStore();
-  const { socket } = useContext(SocketContext);
-  const ecdh = crypto.createECDH("secp256k1");
+  const { socket, ecdhInstance } = useContext(SocketContext);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (!socket) return;
-      socket.emit("joinRoom");
+  socket?.on(
+    "publicKey",
+    (serverKey: string, clientKey: string, sharedKey: string) => {
+      try {
+        const shared = ecdhInstance.computeSecret(
+          serverKey,
+          "base64",
+          "base64"
+        );
 
-      ecdh.generateKeys("base64");
-      let publicKey = ecdh.generateKeys("base64"); // ecdh.getPublicKey("hex");
-      socket.emit("publicKey", publicKey);
-
-    }, 1500);
-  }, []);
-
-  socket?.on("publicKey", (keyy: any, clientKey: any, sharedKey: any) => {
-    try {
-      const shared = ecdh.computeSecret(keyy, "base64", "base64");
-
-      console.log(shared);
-      console.log(sharedKey)
-      console.log(shared === sharedKey)
-    } catch (error) {
-      // console.error("Eroare", error)
+        console.table([serverKey, clientKey, sharedKey]);
+        console.log(shared === sharedKey);
+      } catch (error) {
+        console.error("Eroare", error);
+      }
     }
-  });
+  );
 
   return (
     <div className="App">
