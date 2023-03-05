@@ -1,7 +1,8 @@
 import { useContext, useState } from "react";
 import { SocketContext } from "../../context/socketContext";
-import { decrypt, encrypt } from "../../encryption/encryption";
+import { encrypt } from "../../encryption/encryption";
 import useSecretStore from "../../store/secretStore";
+// @ts-ignore: No typescript support
 
 const SendMessage = () => {
   const { socket } = useContext(SocketContext);
@@ -15,13 +16,10 @@ const SendMessage = () => {
 
   const sendHandler = () => {
     if (!socket) return;
-    console.log(secret.sharedKey)
-    let test = encrypt(secret.sharedKey, { content: message });
-    console.log("encrypted text", test);
-    let testDecrypt = decrypt({key: secret.sharedKey, iv: test.iv}, test.data);
-    console.log("decrypted text", testDecrypt)
+    let encryptedMsg = encrypt(secret.sharedKey, message);
+    secret.setIV(encryptedMsg.iv);
 
-    socket.emit("messageCreate", { content: message });
+    socket.emit("messageCreate", encryptedMsg);
     setMessage("");
   };
 

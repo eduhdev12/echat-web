@@ -8,7 +8,7 @@ export interface SecretsInterace {
 }
 
 const encrypt = (secret: string, data: any) => {
-  let serializedData = JSON.stringify(data);
+  let serializedData = data; // JSON.stringify(data);
 
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(
@@ -31,7 +31,7 @@ const decrypt = (secrets: SecretsInterace, data: any) => {
   let decrypted = decipher.update(data, "base64", "utf8");
   decrypted += decipher.final("utf8");
 
-  return JSON.parse(decrypted);
+  return decrypted;
 };
 
 export { encrypt, decrypt };

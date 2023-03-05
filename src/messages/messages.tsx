@@ -1,5 +1,7 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../context/socketContext";
+import { decrypt } from "../encryption/encryption";
+import useSecretStore from "../store/secretStore";
 import "../style/ChannelMessages.css";
 import {
   Message,
@@ -11,15 +13,29 @@ import MessageContainer from "./message/message";
 
 const Messages = () => {
   const { socket } = useContext(SocketContext);
+  const secret = useSecretStore();
   const [messages, setMessages] = useState<Message[]>([]);
 
-  socket?.on(
-    "messageCreate",
-    (msg: NewMessage, sender: UserMessage, createdAt: Date) => {
-      let newMsg: Message = { message: msg, sender: sender };
-      setMessages([...messages, newMsg]);
-    }
-  );
+  useEffect(() => {
+    socket?.on(
+      "messageCreate",
+      (msg: string, sender: UserMessage, createdAt: Date) => {
+        let messageData: string = decrypt(
+          { key: secret.sharedKey, iv: secret.iv },
+          msg
+        );
+        let newMsg: Message = {
+          message: { text: messageData, createdAt },
+          sender: sender,
+        };
+        setMessages([...messages, newMsg]);
+      }
+    );
+
+    return () => {
+      socket?.off("messageCreate");
+    };
+  }, [secret.iv]);
 
   socket?.on("setMessages", (msgs: SetMessage[]) => {
     let newMessages: Message[] = [];
