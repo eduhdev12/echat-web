@@ -42,24 +42,31 @@ const Messages = () => {
       }
     );
 
-    return () => {
-      socket?.off("messageCreate");
-    };
-  }, [secret]);
+    socket?.on("setMessages", (encryptedMsg: EncryptedMessage) => {
+      let decryptedMsg: SetMessage[] = JSON.parse(
+        decrypt(
+          { key: secret.sharedKey, iv: Buffer.from(encryptedMsg.iv) },
+          encryptedMsg.data
+        )
+      );
+      let newMessages: Message[] = [];
 
-  socket?.on("setMessages", (msgs: SetMessage[]) => {
-    let newMessages: Message[] = [];
+      decryptedMsg.map((msg) => {
+        let newMsg: Message = {
+          message: { text: msg.content, createdAt: msg.createdAt },
+          sender: msg.sender,
+        };
+        newMessages.push(newMsg);
+      });
 
-    msgs.map((msg) => {
-      let newMsg: Message = {
-        message: { text: msg.content, createdAt: msg.createdAt },
-        sender: msg.sender,
-      };
-      newMessages.push(newMsg);
+      setMessages(newMessages);
     });
 
-    setMessages(newMessages);
-  });
+    return () => {
+      socket?.off("messageCreate");
+      socket?.off("setMessages");
+    };
+  }, [secret]);
 
   return (
     <div className="channel_messages">
