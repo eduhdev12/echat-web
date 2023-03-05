@@ -7,10 +7,10 @@ export interface SecretsInterace {
   iv: any;
 }
 
-const encrypt = (secret: string, data: any) => {
+const encrypt = (secret: string, data: any, clientIv?: Buffer) => {
   let serializedData = data; // JSON.stringify(data);
 
-  const iv = crypto.randomBytes(16);
+  const iv = clientIv ?? crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(
     "aes-256-cbc",
     Buffer.from(secret, "base64"),
@@ -23,6 +23,7 @@ const encrypt = (secret: string, data: any) => {
 };
 
 const decrypt = (secrets: SecretsInterace, data: any) => {
+  console.log("decrypt secrets", secrets);
   const decipher = crypto.createDecipheriv(
     "aes-256-cbc",
     Buffer.from(secrets.key, "base64"),
