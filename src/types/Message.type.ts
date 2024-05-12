@@ -3,6 +3,11 @@ export interface Message {
   sender: UserMessage;
 }
 
+export interface EncryptedMessage {
+  data: string;
+  iv: Uint8Array;
+}
+
 export interface NewMessage {
   text?: string;
   createdAt: Date;

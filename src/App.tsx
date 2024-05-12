@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import "./App.css";
 import Login from "./auth/Login";
 import User from "./auth/User";
@@ -6,18 +6,36 @@ import Channels from "./channels/Channels";
 import { SocketContext } from "./context/socketContext";
 import SendMessage from "./messages/components/SendMessage";
 import Messages from "./messages/messages";
+import useSecretStore from "./store/secretStore";
 import useSessionStore from "./store/sessionStore";
 
 function App() {
   const session = useSessionStore();
-  const { socket } = useContext(SocketContext);
+  const secret = useSecretStore();
+  const { socket, ecdhInstance } = useContext(SocketContext);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (!socket) return;
-      socket.emit("joinRoom");
-    }, 1500);
-  }, []);
+  socket?.on(
+    "publicKey",
+    (serverKey: string, clientKey: string, sharedServerKey: string) => {
+      try {
+        const shared = ecdhInstance.computeSecret(
+          serverKey,
+          "base64",
+          "base64"
+        );
+
+        // Note: remove the condition when we remove the argument for verification
+        if (shared === sharedServerKey) {
+          secret.setSharedKey(shared);
+          // setSharedKey(shared)
+          // sharedKey.set(shared);
+          console.log("Sharedkey setup");
+        }
+      } catch (error) {
+        console.error("Eroare", error);
+      }
+    }
+  );
 
   return (
     <div className="App">

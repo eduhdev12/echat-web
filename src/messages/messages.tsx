@@ -1,39 +1,72 @@
-import { useContext, useState } from "react";
+import { Buffer } from "buffer/";
+import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../context/socketContext";
+import { decrypt } from "../encryption/encryption";
+import useSecretStore from "../store/secretStore";
 import "../style/ChannelMessages.css";
 import {
+  EncryptedMessage,
   Message,
   NewMessage,
   SetMessage,
   UserMessage,
 } from "../types/Message.type";
 import MessageContainer from "./message/message";
+// @ts-ignore: No typescript support
+import crypto from "crypto-browserify";
 
 const Messages = () => {
   const { socket } = useContext(SocketContext);
+  const secret = useSecretStore();
   const [messages, setMessages] = useState<Message[]>([]);
 
-  socket?.on(
-    "messageCreate",
-    (msg: NewMessage, sender: UserMessage, createdAt: Date) => {
-      let newMsg: Message = { message: msg, sender: sender };
-      setMessages([...messages, newMsg]);
-    }
-  );
+  useEffect(() => {
+    socket?.on(
+      "messageCreate",
+      (msg: string, sender: EncryptedMessage, createdAt: Date, iv: any) => {
+        let messageData: string = decrypt(
+          { key: secret.sharedKey, iv: Buffer.from(iv) },
+          msg
+        );
+        let messageSender = JSON.parse(
+          decrypt(
+            { key: secret.sharedKey, iv: Buffer.from(sender.iv) },
+            sender.data
+          )
+        );
+        let newMsg: Message = {
+          message: { text: messageData, createdAt },
+          sender: messageSender,
+        };
+        setMessages((messages) => [...messages, newMsg]);
+      }
+    );
 
-  socket?.on("setMessages", (msgs: SetMessage[]) => {
-    let newMessages: Message[] = [];
+    socket?.on("setMessages", (encryptedMsg: EncryptedMessage) => {
+      let decryptedMsg: SetMessage[] = JSON.parse(
+        decrypt(
+          { key: secret.sharedKey, iv: Buffer.from(encryptedMsg.iv) },
+          encryptedMsg.data
+        )
+      );
+      let newMessages: Message[] = [];
 
-    msgs.map((msg) => {
-      let newMsg: Message = {
-        message: { text: msg.content, createdAt: msg.createdAt },
-        sender: msg.sender,
-      };
-      newMessages.push(newMsg);
+      decryptedMsg.map((msg) => {
+        let newMsg: Message = {
+          message: { text: msg.content, createdAt: msg.createdAt },
+          sender: msg.sender,
+        };
+        newMessages.push(newMsg);
+      });
+
+      setMessages(newMessages);
     });
 
-    setMessages(newMessages);
-  });
+    return () => {
+      socket?.off("messageCreate");
+      socket?.off("setMessages");
+    };
+  }, [secret]);
 
   return (
     <div className="channel_messages">

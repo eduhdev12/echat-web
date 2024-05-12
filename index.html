@@ -10,4 +10,17 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
+  <!-- node // crypto -->
+  <script>
+    window.global = window;
+  </script>
+  <script type="module">
+    import { Buffer } from "buffer/"; // <-- no typo here ("/")
+    import process from "process";
+    import EventEmitter from "events";
+
+    window.Buffer = Buffer;
+    window.process = process;
+    window.EventEmitter = EventEmitter;
+  </script>
 </html>
